@@ -1,4 +1,9 @@
 import pygame
+
+from player import Player
+from food_generator import FoodGenerator  # Assurez-vous d'avoir ce fichier dans le même dossier
+
+
 pygame.init()
 
 class MyGame:
@@ -8,14 +13,18 @@ class MyGame:
         self.clock = pygame.time.Clock()
         self.fps = 60
         self.running = True
+        self.player = Player(width // 2, height // 2, 50)  # Position initiale au milieu de l'écran, rayon de 15
+        self.food_generator = FoodGenerator(width, height)  # Ajout de FoodGenerator
 
     def update(self, dt):
-
+        self.player.update(dt)
+        self.food_generator.update(dt)
         pass
 
     def render(self):
-
-        pass
+        self.display.fill((255, 255, 255))
+        self.player.draw(self.display)
+        self.food_generator.draw(self.display)  # Dessiner les aliments générés
 
     def run(self):
         while self.running:
