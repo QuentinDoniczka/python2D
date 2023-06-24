@@ -1,45 +1,68 @@
 import pygame
-import math
+
 
 class Player:
-    def __init__(self, x, y, radius, color=(255, 0, 0)):  # x et y sont la position initiale du joueur, radius est le rayon du cercle
-        self.x = x
-        self.y = y
+    def __init__(self, x, y, radius, color=(255, 0, 0), max_speed=500, growth_rate=1, friction=0.9, speed=1000, update_interval=0.05, max_radius=100, min_radius=50, max_distance=100):
+        self.position = pygame.Vector2(x, y)
         self.radius = radius
         self.color = color
+        self.max_speed = max_speed
+        self.growth_rate = growth_rate
+        self.friction = friction
+        self.speed = speed
+        self.update_interval = update_interval
+        self.max_radius = max_radius
+        self.min_radius = min_radius
+        self.max_distance = max_distance
         self.accumulator = 0
-        self.speed = 1000
+        self.velocity = pygame.Vector2(0, 0)
+        self.acceleration = pygame.Vector2(0, 0)
 
     def draw(self, display):
-        pygame.draw.circle(display, self.color, (self.x, self.y), self.radius)
+        pygame.draw.circle(display, self.color, (int(self.position.x), int(self.position.y)), self.radius)
 
     def update(self, dt):
+        # Gestion de la croissance et du mouvement du joueur
         self.accumulator += dt
-        if self.accumulator >= 0.05:  # Si plus d'une seconde s'est écoulée
-            self.accumulator -= 0.05  # Soustraire une seconde de l'accumulateur
-            if self.radius > 100:
-                self.radius = 50
-            else:
-                self.grow()
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_z]:  # Déplacer vers le haut avec la touche "z"
-            self.y -= self.speed * dt
-        if keys[pygame.K_s]:  # Déplacer vers le bas avec la touche "s"
-            self.y += self.speed * dt
-        if keys[pygame.K_q]:  # Déplacer vers la gauche avec la touche "q"
-            self.x -= self.speed * dt
-        if keys[pygame.K_d]:  # Déplacer vers la droite avec la touche "d"
-            self.x += self.speed * dt
+        if self.accumulator >= self.update_interval:
+            self.accumulator -= self.update_interval
+            self.manage_growth()
 
-        mouse_x, mouse_y = pygame.mouse.get_pos()  # Récupérer la position de la souris
-        dx, dy = mouse_x - self.x, mouse_y - self.y  # Calculer le déplacement nécessaire pour atteindre la souris
-        dist = math.hypot(dx, dy)  # Calculer la distance à la souris
+        self.update_movement(dt)
 
-        if dist:  # Eviter une division par zéro si la souris est déjà sur le joueur
-            dx /= dist  # Normaliser le déplacement pour obtenir un vecteur unitaire
-            dy /= dist  # Normaliser le déplacement pour obtenir un vecteur unitaire
-            self.x += dx * self.speed * dt  # Appliquer le déplacement
-            self.y += dy * self.speed * dt  # Appliquer le déplacement
+    def update_movement(self, dt):
+        # Mise à jour de l'accélération, de la vélocité et de la position du joueur
+        direction = pygame.mouse.get_pos() - self.position
+        distance = direction.length()
 
-    def grow(self):
-        self.radius += 1
+        if distance != 0:
+            self.update_acceleration(direction.normalize(), distance)
+
+        self.update_velocity(dt, distance)
+        self.apply_speed_limit_and_friction()
+
+        self.position += self.velocity * dt
+
+    def update_acceleration(self, direction, dist):
+        # Mise à jour de l'accélération du joueur en fonction de la direction de la souris
+        self.acceleration = direction
+
+    def update_velocity(self, dt, dist):
+        # Mise à jour de la vélocité du joueur en fonction de l'accélération et de la distance à la souris
+        acceleration_modifier = min(dist / self.max_distance, 1)
+        self.velocity += self.acceleration * self.speed * dt * acceleration_modifier
+
+    def apply_speed_limit_and_friction(self):
+        # Application de la friction et de la limite de vitesse au joueur
+        speed = self.velocity.length()
+        if speed > self.max_speed:
+            self.velocity.scale_to_length(self.max_speed)
+
+        self.velocity *= self.friction
+
+    def manage_growth(self):
+        # Gérer la croissance du joueur
+        if self.radius >= self.max_radius:
+            self.radius = self.min_radius
+        else:
+            self.radius += self.growth_rate
