@@ -37,6 +37,7 @@ class MyGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+        pygame.quit()
 
     def check_food_collision(self):
         foodlist = self.food_generator.get_food_list()
@@ -46,4 +47,12 @@ class MyGame:
 
 
 
-pygame.quit()
+
+
+
+
+
+
+
+
+
