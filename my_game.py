@@ -14,13 +14,17 @@ class MyGame:
         self.fps = 60
         self.running = True
         self.players = []  # Define self.players as an empty list
-        self.players.append(Player(width // 2, height // 2, 100))  # Add a Player to the list
+        self.players.append(Player(width // 2, height // 2, 30))  # Add a Player to the list
         self.food_generator = FoodGenerator(width, height)  # Ajout de FoodGenerator
+        self.accumulated_time = 0
 
     def update(self, dt):
         for player in self.players:  # Update each player
             player.update(dt)
         self.food_generator.update(dt)
+        # toutes les seconde et pas tout les frame
+        self.accumulated_time += dt
+        self.check_food_collision()
 
     def render(self):
         self.display.fill((173, 216, 230))
@@ -41,9 +45,16 @@ class MyGame:
 
     def check_food_collision(self):
         foodlist = self.food_generator.get_food_list()
-        for self.player in self.players:
+        food_to_remove = []
+        for player in self.players:
             for food in foodlist:
-                pass # TODO air de colision entre food et joueur
+                x, y = food.get_position()
+                if player.is_point_inside(x, y):
+                    player.eat(2)
+                    food_to_remove.append(food)
+        for food in food_to_remove:
+            foodlist.remove(food)
+
 
 
 
