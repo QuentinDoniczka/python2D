@@ -3,7 +3,7 @@ from food import Food
 
 
 class FoodGenerator:
-    def __init__(self, x, y, max_food=100, spawn_rate=1):
+    def __init__(self, x, y, max_food=10000, spawn_rate=10):
         self.x = x
         self.y = y
         self.spawn_rate = spawn_rate
