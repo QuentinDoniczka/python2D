@@ -25,3 +25,6 @@ class FoodGenerator:
         if len(self.food_list) < self.max_food and self.time_since_last_spawn >= 1 / self.spawn_rate:
             self.generate_food()
             self.time_since_last_spawn = 0  # réinitialise le temps écoulé
+
+    def get_food_list(self):
+        return self.food_list
