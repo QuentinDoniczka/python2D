@@ -7,14 +7,12 @@ class Food:
         self.x = x
         self.y = y
         self.radius = radius
-        self.value = radius/5
-        # Générer une couleur aléatoire
+        self.value = radius / 5
         self.color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
     def draw(self, display):
         pygame.draw.circle(display, self.color, (self.x, self.y), self.radius)
 
-    # afficher les coordonnée
     def __str__(self):
         return f"Food at ({self.x}, {self.y})"
 

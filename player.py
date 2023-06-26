@@ -82,4 +82,4 @@ class Player:
         self.font = pygame.font.Font(None, font_size)
 
     def is_point_inside(self, x, y):
-        return self.position.distance_to((x, y)) <= self.radius
+        return self.position.distance_to((x, y)) <= self.radius + 1

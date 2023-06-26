@@ -1,7 +1,6 @@
 import pygame
-
 from player import Player
-from food_generator import FoodGenerator  # Assurez-vous d'avoir ce fichier dans le même dossier
+from food_generator import FoodGenerator
 
 pygame.init()
 
@@ -13,57 +12,47 @@ class MyGame:
         self.clock = pygame.time.Clock()
         self.fps = 60
         self.running = True
-        self.players = []  # Define self.players as an empty list
-        self.players.append(Player(width // 2, height // 2, 30))  # Add a Player to the list
-        self.food_generator = FoodGenerator(width, height)  # Ajout de FoodGenerator
+        self.player = Player(width // 2, height // 2, 30)
+        self.food_generator = FoodGenerator(width, height)
         self.accumulated_time = 0
 
     def update(self, dt):
-        for player in self.players:  # Update each player
-            player.update(dt)
+        self.player.update(dt)
         self.food_generator.update(dt)
-        # toutes les seconde et pas tout les frame
         self.accumulated_time += dt
-        self.check_food_collision()
+        if self.accumulated_time >= 0.05:
+            self.check_food_collision()
+            self.accumulated_time = 0
 
     def render(self):
         self.display.fill((173, 216, 230))
         self.food_generator.draw(self.display)
-        for player in self.players:  # Draw each player
-            player.draw(self.display)
+        self.player.draw(self.display)
 
     def run(self):
         while self.running:
-            dt = self.clock.tick(self.fps) / 1000  # Obtenir le temps delta en secondes et crée une pause artificiel
+            dt = self.clock.tick(self.fps) / 1000
             self.update(dt)
             self.render()
-            pygame.display.flip()  # Mettre à jour l'écran complet
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
+            pygame.display.flip()
+            self.handle_events()
         pygame.quit()
 
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
     def check_food_collision(self):
-        foodlist = self.food_generator.get_food_list()
-        food_to_remove = []
-        for player in self.players:
-            for food in foodlist:
-                x, y = food.get_position()
-                if player.is_point_inside(x, y):
-                    player.eat(2)
-                    food_to_remove.append(food)
+        # Retrieve the list of food instances
+        food_list = self.food_generator.get_food_list()
+
+        # List comprehension to filter out the food instances that collide with the player
+        # The 'is_point_inside' method is used from the Player class to check the collision
+        food_to_remove = [food for food in food_list if self.player.is_point_inside(*food.get_position())]
+
+        # Iterate over each food instance in the food_to_remove list
+        # Each food instance is 'eaten' by the player and removed from the original food list
         for food in food_to_remove:
-            foodlist.remove(food)
-
-
-
-
-
-
-
-
-
-
-
-
-
+            self.player.eat(2)
+            food_list.remove(food)

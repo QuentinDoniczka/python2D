@@ -9,7 +9,7 @@ class FoodGenerator:
         self.spawn_rate = spawn_rate
         self.max_food = max_food
         self.food_list = []
-        self.time_since_last_spawn = 0  # ajoute un attribut pour garder une trace du temps écoulé
+        self.time_since_last_spawn = 0
 
     def generate_food(self):
         x = random.randint(0, self.x)
@@ -21,10 +21,13 @@ class FoodGenerator:
             food.draw(display)
 
     def update(self, dt):
-        self.time_since_last_spawn += dt  # augmente le temps écoulé
-        if len(self.food_list) < self.max_food and self.time_since_last_spawn >= 1 / self.spawn_rate:
+        self.time_since_last_spawn += dt
+        if self.should_generate_food():
             self.generate_food()
-            self.time_since_last_spawn = 0  # réinitialise le temps écoulé
+            self.time_since_last_spawn = 0
 
     def get_food_list(self):
         return self.food_list
+
+    def should_generate_food(self):
+        return len(self.food_list) < self.max_food and self.time_since_last_spawn >= 1 / self.spawn_rate
