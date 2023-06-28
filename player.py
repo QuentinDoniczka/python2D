@@ -10,9 +10,10 @@ class Player:
         self.radius = 0
 
         self.velocity = pygame.Vector2(0, 0)
+        print(self.velocity)
         self.friction = 0.95
         self.acceleration = 800
-        self.max_speed = 1000
+        self.max_speed = 210
         self.max_distance = 100
 
         self.max_growth = 1000000

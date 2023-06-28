@@ -30,6 +30,7 @@ class MyGame:
         self.player.draw(self.display)
 
     def run(self):
+        self.clock.tick()
         while self.running:
             dt = self.clock.tick(self.fps) / 1000
             self.update(dt)
